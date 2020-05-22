@@ -11,6 +11,18 @@ import { checkVariableDeclarationList, transformBindingPattern } from "../variab
 import { LuaTarget } from "../../../CompilerOptions";
 //import { unsupportedForTarget } from "../../utils/diagnostics";
 
+function wrapStatements(expression: lua.Identifier, statements: lua.Statement[]): lua.Statement[] {
+  let result = [] as lua.Statement[]
+  for (const item of statements) {
+    result = result.concat(wrapWithIf(expression, item))
+  }
+  return result
+}
+
+function wrapBlock(expression: lua.Identifier, block: lua.Block): lua.Block {
+  return lua.createBlock(wrapStatements(expression, block.statements))
+}
+
 function wrapWithIf(expression: lua.Identifier, statement: lua.Statement): lua.Statement[] {
   // Still want variables to be around in the scope they originated in
   if (statement.kind === lua.SyntaxKind.VariableDeclarationStatement) {
@@ -26,10 +38,48 @@ function wrapWithIf(expression: lua.Identifier, statement: lua.Statement): lua.S
     ]
   }
 
-  //if (statement.kind === lua.SyntaxKind.Block) {
-    //const block = statement as lua.Block
-    //const result = 
-  //}
+  if (statement.kind === lua.SyntaxKind.IfStatement) {
+    const ifStatement = statement as lua.IfStatement
+    const { ifBlock, elseBlock } = ifStatement
+
+    const comparison = lua.createBinaryExpression(expression, ifStatement.condition, lua.SyntaxKind.AndOperator)
+    const wrappedIf = wrapBlock(expression, ifBlock)
+
+    if (elseBlock == null) {
+      return [lua.createIfStatement(
+        comparison,
+        wrappedIf,
+        undefined
+      )]
+    }
+
+    if (elseBlock.kind === lua.SyntaxKind.Block) {
+      return [lua.createIfStatement(
+        comparison,
+        wrappedIf,
+        wrapBlock(expression, elseBlock),
+      )]
+    }
+
+    if (elseBlock.kind === lua.SyntaxKind.IfStatement) {
+      const [result] = wrapWithIf(expression, elseBlock)
+      if (result.kind === lua.SyntaxKind.IfStatement) {
+        const ifResult = result as lua.IfStatement
+        return [lua.createIfStatement(
+          comparison,
+          wrappedIf,
+          ifResult,
+        )]
+      }
+    }
+  }
+
+  if (statement.kind === lua.SyntaxKind.DoStatement) {
+    const doBlock = statement as lua.DoStatement
+    return [
+      lua.createDoStatement(wrapStatements(expression, doBlock.statements))
+    ]
+  }
 
   return [lua.createIfStatement(
     expression,
@@ -56,12 +106,8 @@ export function transformLoopBody(
     if (context.luaTarget === LuaTarget.Lua51) {
       const flag = lua.createIdentifier(reference)
       scope.continueFlag = flag
-      let baseResult: lua.Statement[] = [lua.createVariableDeclarationStatement(flag, lua.createBooleanLiteral(true))];
-      // Wrap every statement in an if check
-      for (const statement of body) {
-         baseResult = baseResult.concat(wrapWithIf(flag, statement))
-      }
-      return baseResult
+      const baseResult: lua.Statement[] = [lua.createVariableDeclarationStatement(flag, lua.createBooleanLiteral(true))];
+      return baseResult.concat(wrapStatements(flag, body))
     }
 
     const baseResult: lua.Statement[] = [lua.createDoStatement(body)];
