@@ -56,6 +56,7 @@ export enum LuaLibFeature {
     Spread = "Spread",
     StringConcat = "StringConcat",
     StringEndsWith = "StringEndsWith",
+    StringIncludes = "StringIncludes",
     StringPadEnd = "StringPadEnd",
     StringPadStart = "StringPadStart",
     StringReplace = "StringReplace",
