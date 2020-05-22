@@ -8,6 +8,34 @@ import { transformAssignmentPattern } from "../binary-expression/destructuring-a
 import { transformBlockOrStatement } from "../block";
 import { transformIdentifier } from "../identifier";
 import { checkVariableDeclarationList, transformBindingPattern } from "../variable-declaration";
+import { LuaTarget } from "../../../CompilerOptions";
+//import { unsupportedForTarget } from "../../utils/diagnostics";
+
+function wrapWithIf(expression: lua.Identifier, statement: lua.Statement): lua.Statement[] {
+  // Still want variables to be around in the scope they originated in
+  if (statement.kind === lua.SyntaxKind.VariableDeclarationStatement) {
+    const declaration = statement as lua.VariableDeclarationStatement
+    return [
+      lua.createVariableDeclarationStatement(declaration.left),
+      lua.createIfStatement(
+        expression,
+        lua.createBlock([
+          lua.createAssignmentStatement(declaration.left, declaration.right)
+        ])
+      )
+    ]
+  }
+
+  //if (statement.kind === lua.SyntaxKind.Block) {
+    //const block = statement as lua.Block
+    //const result = 
+  //}
+
+  return [lua.createIfStatement(
+    expression,
+    lua.createBlock([statement])
+  )]
+}
 
 export function transformLoopBody(
     context: TransformationContext,
@@ -22,8 +50,22 @@ export function transformLoopBody(
         return body;
     }
 
+    const reference = `__continue${scopeId}`
+
+    // Janky way of doing this in 5.1. Just check the value of a variable before every statement.
+    if (context.luaTarget === LuaTarget.Lua51) {
+      const flag = lua.createIdentifier(reference)
+      scope.continueFlag = flag
+      let baseResult: lua.Statement[] = [lua.createVariableDeclarationStatement(flag, lua.createBooleanLiteral(true))];
+      // Wrap every statement in an if check
+      for (const statement of body) {
+         baseResult = baseResult.concat(wrapWithIf(flag, statement))
+      }
+      return baseResult
+    }
+
     const baseResult: lua.Statement[] = [lua.createDoStatement(body)];
-    const continueLabel = lua.createLabelStatement(`__continue${scopeId}`);
+    const continueLabel = lua.createLabelStatement(reference);
     baseResult.push(continueLabel);
 
     return baseResult;

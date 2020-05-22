@@ -30,6 +30,7 @@ export interface Scope {
     importStatements?: lua.Statement[];
     loopContinued?: boolean;
     functionReturned?: boolean;
+    continueFlag?: lua.Identifier;
 }
 
 const scopeStacks = new WeakMap<TransformationContext, Scope[]>();

@@ -310,6 +310,7 @@ export function isWhileStatement(node: Node): node is WhileStatement {
     return node.kind === SyntaxKind.WhileStatement;
 }
 
+
 export function createWhileStatement(body: Block, condition: Expression, tsOriginal?: ts.Node): WhileStatement {
     const statement = createNode(SyntaxKind.WhileStatement, tsOriginal) as WhileStatement;
     statement.body = body;
