@@ -11,7 +11,7 @@ import { checkVariableDeclarationList, transformBindingPattern } from "../variab
 import { LuaTarget } from "../../../CompilerOptions";
 //import { unsupportedForTarget } from "../../utils/diagnostics";
 
-function wrapStatements(expression: lua.Identifier, statements: lua.Statement[]): lua.Statement[] {
+export function wrapStatements(expression: lua.Expression, statements: lua.Statement[]): lua.Statement[] {
   let result = [] as lua.Statement[]
   for (const item of statements) {
     result = result.concat(wrapWithIf(expression, item))
@@ -19,11 +19,11 @@ function wrapStatements(expression: lua.Identifier, statements: lua.Statement[])
   return result
 }
 
-function wrapBlock(expression: lua.Identifier, block: lua.Block): lua.Block {
+function wrapBlock(expression: lua.Expression, block: lua.Block): lua.Block {
   return lua.createBlock(wrapStatements(expression, block.statements))
 }
 
-function wrapWithIf(expression: lua.Identifier, statement: lua.Statement): lua.Statement[] {
+function wrapWithIf(expression: lua.Expression, statement: lua.Statement): lua.Statement[] {
   // Still want variables to be around in the scope they originated in
   if (statement.kind === lua.SyntaxKind.VariableDeclarationStatement) {
     const declaration = statement as lua.VariableDeclarationStatement

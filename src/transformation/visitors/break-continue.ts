@@ -7,6 +7,10 @@ import { LuaTarget } from "../../CompilerOptions";
 export const transformBreakStatement: FunctionVisitor<ts.BreakStatement> = (breakStatement, context) => {
     const breakableScope = findScope(context, ScopeType.Loop | ScopeType.Switch);
     if (breakableScope?.type === ScopeType.Switch) {
+        if (context.luaTarget === LuaTarget.Lua51) {
+          return lua.createAssignmentStatement(lua.createIdentifier(`____switch${breakableScope.id}_break`), lua.createBooleanLiteral(false));
+        }
+
         return lua.createGotoStatement(`____switch${breakableScope.id}_end`);
     } else {
         return lua.createBreakStatement(breakStatement);
