@@ -63,7 +63,7 @@ export function transformBinaryBitOperation(
 ): lua.Expression {
     switch (context.luaTarget) {
         case LuaTarget.Lua51:
-            context.diagnostics.push(unsupportedForTarget(node, "Bitwise operations", LuaTarget.Lua51));
+            return transformBinaryBitLibOperation(node, left, right, operator, "bit");
 
         case LuaTarget.LuaJIT:
             return transformBinaryBitLibOperation(node, left, right, operator, "bit");
