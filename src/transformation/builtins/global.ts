@@ -4,6 +4,7 @@ import { TransformationContext } from "../context";
 import { LuaLibFeature, transformLuaLibFunction } from "../utils/lualib";
 import { isNumberType } from "../utils/typescript";
 import { transformArguments } from "../visitors/call";
+import { unsupportedGlobal } from "../utils/diagnostics";
 
 export function transformGlobalCall(
     context: TransformationContext,
@@ -30,5 +31,10 @@ export function transformGlobalCall(
                 node,
                 ...numberParameters
             );
+        case "Function":
+            // ignore this, will be handled elsewhere
+            return undefined;
+        default:
+            context.diagnostics.push(unsupportedGlobal(node, name));
     }
 }

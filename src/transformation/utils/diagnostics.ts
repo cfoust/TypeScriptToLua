@@ -111,6 +111,8 @@ export const unsupportedForTarget = createDiagnosticFactory(
         `${functionality} is/are not supported for target ${getLuaTargetName(version)}.`
 );
 
+export const unsupportedGlobal = createDiagnosticFactory((globalName: string) => `${globalName} is unsupported.`);
+
 export const unsupportedProperty = createDiagnosticFactory(
     (parentName: string, property: string) => `${parentName}.${property} is unsupported.`
 );
