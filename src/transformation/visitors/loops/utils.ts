@@ -27,15 +27,20 @@ function wrapWithIf(expression: lua.Expression, statement: lua.Statement): lua.S
   // Still want variables to be around in the scope they originated in
   if (statement.kind === lua.SyntaxKind.VariableDeclarationStatement) {
     const declaration = statement as lua.VariableDeclarationStatement
-    return [
+    const result: lua.Statement[] = [
       lua.createVariableDeclarationStatement(declaration.left),
-      lua.createIfStatement(
+    ]
+
+    if (declaration.right != null) {
+      result.push(lua.createIfStatement(
         expression,
         lua.createBlock([
           lua.createAssignmentStatement(declaration.left, declaration.right)
         ])
-      )
-    ]
+      ))
+    }
+
+    return result
   }
 
   if (statement.kind === lua.SyntaxKind.IfStatement) {
