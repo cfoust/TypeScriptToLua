@@ -18,6 +18,7 @@ export function transformGlobalCall(
         case "SymbolConstructor":
             return transformLuaLibFunction(context, LuaLibFeature.Symbol, node, ...parameters);
         case "NumberConstructor":
+        case "parseInt":
             return transformLuaLibFunction(context, LuaLibFeature.Number, node, ...parameters);
         case "isNaN":
         case "isFinite":

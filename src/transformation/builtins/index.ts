@@ -23,6 +23,7 @@ import { transformNumberConstructorCall, transformNumberPrototypeCall } from "./
 import { transformObjectConstructorCall, transformObjectPrototypeCall } from "./object";
 import { transformStringConstructorCall, transformStringProperty, transformStringPrototypeCall } from "./string";
 import { transformSymbolConstructorCall } from "./symbol";
+import { transformJSONCall } from "./json";
 
 export function transformBuiltinPropertyAccessExpression(
     context: TransformationContext,
@@ -78,6 +79,8 @@ export function transformBuiltinCallExpression(
                 return transformConsoleCall(context, node);
             case "Math":
                 return transformMathCall(context, node);
+            case "JSON":
+                return transformJSONCall(context, node);
             case "StringConstructor":
                 return transformStringConstructorCall(context, node);
             case "ObjectConstructor":

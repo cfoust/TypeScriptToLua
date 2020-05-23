@@ -103,9 +103,13 @@ export function transformArrayConstructorCall(
     expression: PropertyCallExpression
 ): lua.CallExpression | undefined {
     const method = expression.expression;
-    //const parameters = transformArguments(context, expression.arguments);
+    const parameters = transformArguments(context, expression.arguments);
     const methodName = method.name.text;
     switch (methodName) {
+        case "isArray":
+            return transformLuaLibFunction(context, LuaLibFeature.ArrayIsArray, expression, ...parameters);
+        case "from":
+            return transformLuaLibFunction(context, LuaLibFeature.ArrayFrom, expression, ...parameters);
         default:
             context.diagnostics.push(unsupportedProperty(method.name, "Array", methodName));
     }
