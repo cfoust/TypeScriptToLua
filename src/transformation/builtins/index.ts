@@ -14,7 +14,7 @@ import {
 } from "../utils/typescript";
 import { PropertyCallExpression } from "../visitors/call";
 import { checkForLuaLibType } from "../visitors/class/new";
-import { transformArrayProperty, transformArrayPrototypeCall } from "./array";
+import { transformArrayConstructorCall, transformArrayProperty, transformArrayPrototypeCall } from "./array";
 import { transformConsoleCall } from "./console";
 import { transformFunctionPrototypeCall } from "./function";
 import { transformGlobalCall } from "./global";
@@ -86,6 +86,8 @@ export function transformBuiltinCallExpression(
                 return transformSymbolConstructorCall(context, node);
             case "NumberConstructor":
                 return transformNumberConstructorCall(context, node);
+            case "ArrayConstructor":
+                return transformArrayConstructorCall(context, node);
         }
     }
 

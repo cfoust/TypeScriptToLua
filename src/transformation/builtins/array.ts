@@ -97,3 +97,18 @@ export function transformArrayProperty(
             return undefined;
     }
 }
+
+export function transformArrayConstructorCall(
+    context: TransformationContext,
+    expression: PropertyCallExpression
+): lua.CallExpression | undefined {
+    const method = expression.expression;
+    //const parameters = transformArguments(context, expression.arguments);
+    const methodName = method.name.text;
+    switch (methodName) {
+        default:
+            context.diagnostics.push(unsupportedProperty(method.name, "Array", methodName));
+    }
+
+    return undefined;
+}

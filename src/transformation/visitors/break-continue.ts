@@ -8,7 +8,10 @@ export const transformBreakStatement: FunctionVisitor<ts.BreakStatement> = (brea
     const breakableScope = findScope(context, ScopeType.Loop | ScopeType.Switch);
     if (breakableScope?.type === ScopeType.Switch) {
         if (context.luaTarget === LuaTarget.Lua51) {
-          return lua.createAssignmentStatement(lua.createIdentifier(`____switch${breakableScope.id}_break`), lua.createBooleanLiteral(false));
+            return lua.createAssignmentStatement(
+                lua.createIdentifier(`____switch${breakableScope.id}_break`),
+                lua.createBooleanLiteral(false)
+            );
         }
 
         return lua.createGotoStatement(`____switch${breakableScope.id}_end`);
@@ -18,17 +21,17 @@ export const transformBreakStatement: FunctionVisitor<ts.BreakStatement> = (brea
 };
 
 export const transformContinueStatement: FunctionVisitor<ts.ContinueStatement> = (statement, context) => {
-  const scope = findScope(context, ScopeType.Loop);
+    const scope = findScope(context, ScopeType.Loop);
 
-  if (scope) {
-    scope.loopContinued = true;
-  }
+    if (scope) {
+        scope.loopContinued = true;
+    }
 
-  const reference = `__continue${scope?.id ?? ""}`
+    const reference = `__continue${scope?.id ?? ""}`;
 
-  if (context.luaTarget === LuaTarget.Lua51) {
-    return lua.createAssignmentStatement(lua.createIdentifier(reference), lua.createBooleanLiteral(false));
-  }
+    if (context.luaTarget === LuaTarget.Lua51) {
+        return lua.createAssignmentStatement(lua.createIdentifier(reference), lua.createBooleanLiteral(false));
+    }
 
-  return lua.createGotoStatement(reference, statement);
+    return lua.createGotoStatement(reference, statement);
 };

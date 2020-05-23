@@ -7,18 +7,18 @@ function __TS__StringReplace(
     dontFilter: boolean | undefined
 ): string {
     if (dontFilter) {
-      if (typeof replaceValue === "string") {
-        const [result] = string.gsub(source, searchValue, replaceValue, 1);
-        return result;
-      } else {
-        const [result] = string.gsub(
-          source,
-          searchValue,
-          match => (replaceValue as (substring: string) => string)(match),
-            1
-        );
-        return result;
-      }
+        if (typeof replaceValue === "string") {
+            const [result] = string.gsub(source, searchValue, replaceValue, 1);
+            return result;
+        } else {
+            const [result] = string.gsub(
+                source,
+                searchValue,
+                match => (replaceValue as (substring: string) => string)(match),
+                1
+            );
+            return result;
+        }
     }
 
     [searchValue] = string.gsub(searchValue, "[%%%(%)%.%+%-%*%?%[%^%$]", "%%%1");

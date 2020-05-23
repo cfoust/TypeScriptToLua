@@ -4,7 +4,7 @@ interface ErrorType {
 }
 
 function __TS__GetErrorStack(): string {
-    return ''
+    return "";
 }
 
 function __TS__WrapErrorToString<T extends Error>(getDescription: (this: T) => string): (this: T) => string {
@@ -26,7 +26,7 @@ Error = __TS__InitErrorClass(
         public stack: string;
 
         constructor(public message = "") {
-            this.stack = '';
+            this.stack = "";
             const metatable = getmetatable(this);
             if (!metatable.__errorToStringPatched) {
                 metatable.__errorToStringPatched = true;

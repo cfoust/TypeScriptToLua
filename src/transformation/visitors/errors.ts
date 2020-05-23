@@ -111,7 +111,9 @@ export const transformThrowStatement: FunctionVisitor<ts.ThrowStatement> = (stat
     }
 
     return lua.createExpressionStatement(
-        lua.createCallExpression(lua.createIdentifier("error"), [lua.createCallExpression(lua.createIdentifier("tostring"), parameters)]),
+        lua.createCallExpression(lua.createIdentifier("error"), [
+            lua.createCallExpression(lua.createIdentifier("tostring"), parameters),
+        ]),
         statement
     );
 };
