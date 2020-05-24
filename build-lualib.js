@@ -12,9 +12,10 @@ emitResult.forEach(({ name, text }) => ts.sys.writeFile(name, text));
 const reportDiagnostic = tstl.createDiagnosticReporter(true);
 diagnostics.forEach(reportDiagnostic);
 
+const luaData = fs.readFileSync("src/lualib/json.lua", "utf8");
 const bundlePath = path.join(__dirname, "dist/lualib/lualib_bundle.lua");
 if (fs.existsSync(bundlePath)) {
     fs.unlinkSync(bundlePath);
 }
 
-fs.writeFileSync(bundlePath, loadLuaLibFeatures(Object.values(tstl.LuaLibFeature), ts.sys));
+fs.writeFileSync(bundlePath, luaData + loadLuaLibFeatures(Object.values(tstl.LuaLibFeature), ts.sys));
